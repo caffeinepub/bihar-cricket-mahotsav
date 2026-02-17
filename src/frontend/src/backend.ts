@@ -229,6 +229,8 @@ export interface backendInterface {
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
     addTeamInfo(name: string, owner: string | null, logo: string | null, purse: bigint, teamType: Team): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    assignRole(user: Principal, role: UserRole): Promise<void>;
+    becomeFirstAdmin(): Promise<void>;
     checkout(): Promise<CreatePaymentResponse>;
     deleteContentPage(pageId: string): Promise<void>;
     deleteFile(fileId: string): Promise<void>;
@@ -253,6 +255,7 @@ export interface backendInterface {
     getTeams(): Promise<Array<TeamInfo>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
+    isSystemBootstrapNeeded(): Promise<boolean>;
     listCategories(): Promise<Array<PlayerCategory>>;
     listExperienceLevels(): Promise<Array<CricketExperience>>;
     listJerseySizes(): Promise<Array<JerseySize>>;
@@ -397,6 +400,34 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n11(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async assignRole(arg0: Principal, arg1: UserRole): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.assignRole(arg0, to_candid_UserRole_n11(this._uploadFile, this._downloadFile, arg1));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.assignRole(arg0, to_candid_UserRole_n11(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async becomeFirstAdmin(): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.becomeFirstAdmin();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.becomeFirstAdmin();
             return result;
         }
     }
@@ -733,6 +764,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.isCallerAdmin();
+            return result;
+        }
+    }
+    async isSystemBootstrapNeeded(): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.isSystemBootstrapNeeded();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.isSystemBootstrapNeeded();
             return result;
         }
     }

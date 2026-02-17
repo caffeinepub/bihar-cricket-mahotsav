@@ -1,15 +1,28 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-17T19:01:30.995Z",
-  "summary": "The diff updates the Principal ID retrieval to use the backend actor method `getCallerIdAsText()` via a React Query hook that is keyed/enabled based on the current Internet Identity principal, and the Admin Login page invalidates relevant queries after login/logout to refresh auth-dependent state. From the truncated snippets, core intent of REQ-17/REQ-18 appears addressed, but some UI-specific acceptance criteria (e.g., visible Retry button/error text behavior) cannot be fully verified from the provided diff summary.",
-  "missing_requirements": [],
+  "generatedAt": "2026-02-17T19:15:01.848Z",
+  "summary": "Frontend changes implement admin-route guarding/redirects, add a mobile-friendly clipboard utility, add React Query hooks for admin/bootstrapping/caller principal lookup, and update the admin login/troubleshooting page to use these hooks. However, the diff summary does not provide evidence that the backend exposes the required bootstrap-detection query method (admin count/any-admins) that the frontend now calls.",
+  "missing_requirements": [
+    {
+      "id": "REQ-19",
+      "requirement": "Backend exposes a query method that reliably indicates whether any admins exist (or returns an admin count), and the frontend uses it to drive the bootstrap UI state.",
+      "reason": "Frontend now calls `actor.isSystemBootstrapNeeded()` to drive the 'Become the First Admin' CTA, but the backend diff excerpt is truncated and does not show any added/updated query method implementing this bootstrap/admin-count check.",
+      "evidence": [
+        "frontend/src/hooks/useQueries.ts (calls actor.isSystemBootstrapNeeded())",
+        "backend/main.mo (truncated; no visible evidence of isSystemBootstrapNeeded/admin-count query method)"
+      ]
+    }
+  ],
   "hallucinated_features": [],
-  "confidence": 0.66,
+  "confidence": 0.62,
   "changed_files": [
+    "backend/main.mo",
     "frontend-file-summaries.txt",
+    "frontend/src/components/admin/AdminRouteGuard.tsx",
     "frontend/src/hooks/useQueries.ts",
     "frontend/src/pages/AdminLoginPage.tsx",
+    "frontend/src/utils/clipboard.ts",
     "project_state.json"
   ]
 }

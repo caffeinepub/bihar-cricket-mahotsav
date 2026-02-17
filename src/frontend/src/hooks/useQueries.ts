@@ -56,6 +56,21 @@ export function useIsCallerAdmin() {
   });
 }
 
+// System Bootstrap Check - determines if "Become First Admin" should be shown
+export function useIsSystemBootstrapNeeded() {
+  const { actor, isFetching } = useActor();
+
+  return useQuery<boolean>({
+    queryKey: ['isSystemBootstrapNeeded'],
+    queryFn: async () => {
+      if (!actor) return false;
+      return actor.isSystemBootstrapNeeded();
+    },
+    enabled: !!actor && !isFetching,
+    retry: false,
+  });
+}
+
 // Get Caller ID as Text - authentication-aware with identity-based cache key
 export function useGetCallerIdAsText() {
   const { actor, isFetching } = useActor();
@@ -90,6 +105,29 @@ export function useGetCallerUserRole() {
     },
     enabled: !!actor && !isFetching,
     retry: false,
+  });
+}
+
+// Become First Admin (Bootstrap)
+export function useBecomeFirstAdmin() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      if (!actor) throw new Error('Actor not initialized');
+      return actor.becomeFirstAdmin();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['isAdmin'] });
+      queryClient.invalidateQueries({ queryKey: ['callerUserRole'] });
+      queryClient.invalidateQueries({ queryKey: ['isSystemBootstrapNeeded'] });
+      toast.success('You are now the first admin!');
+    },
+    onError: (error: any) => {
+      console.error('Failed to become first admin:', error);
+      toast.error(error?.message || 'Failed to become first admin');
+    },
   });
 }
 

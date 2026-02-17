@@ -1,69 +1,76 @@
 {
   "kind": "build_request",
-  "title": "Fix Admin Login Principal ID retrieval on mobile",
+  "title": "Fix admin access flow and first-admin bootstrap detection",
   "projectName": "Bihar Cricket Mahotsav",
   "priority": "high",
   "requirements": [
     {
-      "id": "REQ-17",
-      "text": "Diagnose and fix the Admin Login screen so that, after a successful Internet Identity sign-in, the authenticated user’s Principal ID is reliably retrieved via the backend method `getCallerIdAsText()` (not via `window.ic`) and displayed on `/admin/login`, including on mobile browsers.",
-      "target": "frontend",
+      "id": "REQ-19",
+      "text": "Fix the first-admin bootstrap detection so the UI only offers “Become the First Admin” when the backend confirms that zero admin principals exist (do not infer this state from the caller’s role being `guest`).",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-5"
         ],
         "quotes": [
-          "yes fix it",
-          "facing this problem"
+          "fix it"
         ]
       },
       "acceptanceCriteria": [
-        "On `/admin/login`, after signing in with Internet Identity on a mobile browser, the Principal ID field populates with a non-empty principal string (e.g., `aaaaa-aa...`) without showing “Failed to retrieve Principal ID”.",
-        "The Admin Login page does not depend on `window.ic` for Principal ID retrieval.",
-        "If Principal ID retrieval fails, the UI continues to show an actionable Retry button and the page remains usable (no crash/blank screen)."
+        "When at least one admin already exists, `/admin/login` does not show the “Become the First Admin” call-to-action to non-admin users.",
+        "When there are zero admins configured, an authenticated user visiting `/admin/login` sees the “Become the First Admin” call-to-action.",
+        "The backend exposes a query method that reliably indicates whether any admins exist (or returns an admin count), and the frontend uses it to drive the bootstrap UI state."
       ]
     },
     {
-      "id": "REQ-18",
-      "text": "Ensure the Principal ID query lifecycle is tied to the current authentication state so it automatically refreshes when the Internet Identity session becomes available (e.g., after login, logout, or identity change), preventing stale error states from persisting across sign-in attempts.",
+      "id": "REQ-20",
+      "text": "Ensure the Access Denied experience for authenticated non-admin users provides a clear admin setup/troubleshooting path by always showing the authenticated user’s Principal ID (retrieved via the backend method `getCallerIdAsText()`), along with copy-to-clipboard and retry behaviors that work on mobile browsers.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-5"
         ],
         "quotes": [
-          "Failed to retrieve Principal ID. Please try again."
+          "fix it"
         ]
       },
       "acceptanceCriteria": [
-        "After clicking “Sign in with Internet Identity”, the Principal ID query is re-attempted automatically once the authenticated identity/actor is ready (without requiring manual Retry).",
-        "If a previous unauthenticated/failed attempt occurred, a subsequent successful sign-in results in a fresh Principal ID fetch and display.",
-        "Manual “Retry” still forces a refetch and can recover from transient failures."
+        "When an authenticated non-admin user is denied admin access, the screen shows “Your Principal ID” and displays the value returned by `getCallerIdAsText()`.",
+        "If Principal ID retrieval fails, the UI shows an error state and a retry button that re-runs the Principal ID query.",
+        "A copy button copies the Principal ID to the clipboard when available; if clipboard access fails, the user sees an error toast/message.",
+        "No code path attempts to read Principal ID from `window.ic` for this screen."
+      ]
+    },
+    {
+      "id": "REQ-21",
+      "text": "Adjust admin route behavior so an authenticated non-admin user attempting to open admin pages (e.g., `/admin`, `/admin/players`, `/admin/sponsors`, `/admin/teams`) is directed to the dedicated troubleshooting/admin-login experience (instead of being stuck on a dead-end denial screen), without creating redirect loops.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-5"
+        ],
+        "quotes": [
+          "fix it"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Unauthenticated users who open any admin route are redirected to `/admin/login`.",
+        "Authenticated admins can access admin routes normally.",
+        "Authenticated non-admin users who open any admin route are routed to an admin-access troubleshooting experience (e.g., `/admin/login` or an equivalent screen) and are not trapped in redirect loops.",
+        "The routed troubleshooting experience continues to display Principal ID and sign-out options as shown in the uploaded screenshot context (Access Denied + Principal ID + Sign Out/Go to Home)."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files under `frontend/src/hooks/useInternetIdentity.ts` / `frontend/src/hooks/useInternetIdentity.tsx` or other paths listed in `frontend.immutablePaths`.",
-    "Backend remains single-actor; do not introduce additional canisters/services."
+    "Backend must remain a single Motoko actor in `backend/main.mo` (no additional backend services).",
+    "Do not edit files in `frontend/src/hooks/useInternetIdentity.ts`, `frontend/src/hooks/useInternetIdentity.tsx`, `frontend/src/hooks/useActor.ts`, `frontend/src/main.tsx`, or anything under `frontend/src/components/ui` (compose instead)."
   ],
   "nonGoals": [
-    "Redesigning the Home page UI/typography/motion (already covered by existing features).",
-    "Adding new authentication providers beyond Internet Identity."
+    "Homepage redesign/typography/motion changes not directly required to fix the admin access issue.",
+    "Adding third-party authentication providers (only Internet Identity is supported)."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [
-      "Use English for any user-facing text."
-    ],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

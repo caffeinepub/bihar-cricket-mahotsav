@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 13,
+  "projectStateVersion": 15,
   "summary": "Project for the Bihar Cricket Mahotsav website, including admin panel access setup (Principal ID + permissions), adding admin panel login capability, and making the front page simple and professional.",
   "architectural_notes": [
     "Admin Login must retrieve/display the authenticated user's Principal ID via a backend call (e.g., getCallerPrincipal) rather than relying on `window.ic`, which is unreliable across browsers (especially mobile)."
@@ -137,6 +137,30 @@
       "title": "Ensure the Principal ID query lifecycle is tied to the current authentication state so it automatically refreshes when the Internet Identity session becomes available (e.g., after login, logout, or identity change), preventing stale error states from persisting across sign-in attempts.",
       "reqIds": [
         "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-first-admin-bootstrap-detection-so-the-ui-only-offers-become-the-first-admin-when-the-backend-confirms-that-zero-admin-principals-exist-do-not-infer-this-state-from-the-caller-s-role-being-guest",
+      "title": "Fix the first-admin bootstrap detection so the UI only offers “Become the First Admin” when the backend confirms that zero admin principals exist (do not infer this state from the caller’s role being `guest`).",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-access-denied-experience-for-authenticated-non-admin-users-provides-a-clear-admin-setup-troubleshooting-path-by-always-showing-the-authenticated-user-s-principal-id-retrieved-via-the-backend-method-getcalleridastext-along-with-copy-to-clipboard-and-retry-behaviors-that-work-on-mobile-browsers",
+      "title": "Ensure the Access Denied experience for authenticated non-admin users provides a clear admin setup/troubleshooting path by always showing the authenticated user’s Principal ID (retrieved via the backend method `getCallerIdAsText()`), along with copy-to-clipboard and retry behaviors that work on mobile browsers.",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-adjust-admin-route-behavior-so-an-authenticated-non-admin-user-attempting-to-open-admin-pages-e-g-admin-admin-players-admin-sponsors-admin-teams-is-directed-to-the-dedicated-troubleshooting-admin-login-experience-instead-of-being-stuck-on-a-dead-end-denial-screen-without-creating-redirect-loops",
+      "title": "Adjust admin route behavior so an authenticated non-admin user attempting to open admin pages (e.g., `/admin`, `/admin/players`, `/admin/sponsors`, `/admin/teams`) is directed to the dedicated troubleshooting/admin-login experience (instead of being stuck on a dead-end denial screen), without creating redirect loops.",
+      "reqIds": [
+        "REQ-21"
       ],
       "version": 1
     }

@@ -1,18 +1,18 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-17T19:01:30.998Z",
+  "generatedAt": "2026-02-17T19:15:01.851Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 2,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
-        "id": "REQ-17",
-        "summary": "Diagnose and fix the Admin Login screen so that, after a successful Internet Identity sign-in, the authenticated user’s Principal ID is reliably retrieved via the backend method `getCallerIdAsText()` (not via `window.ic`) and displayed on `/admin/login`, including on mobile browsers.",
+        "id": "REQ-19",
+        "summary": "Fix the first-admin bootstrap detection so the UI only offers “Become the First Admin” when the backend confirms that zero admin principals exist (do not infer this state from the caller’s role being `guest`).",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/hooks/useQueries.ts",
@@ -24,27 +24,45 @@
         ]
       },
       {
-        "id": "REQ-18",
-        "summary": "Ensure the Principal ID query lifecycle is tied to the current authentication state so it automatically refreshes when the Internet Identity session becomes available (e.g., after login, logout, or identity change), preventing stale error states from persisting across sign-in attempts.",
+        "id": "REQ-20",
+        "summary": "Ensure the Access Denied experience for authenticated non-admin users provides a clear admin setup/troubleshooting path by always showing the authenticated user’s Principal ID (retrieved via the backend method `getCallerIdAsText()`), along with copy-to-clipboard and retry behaviors that work on mobile browsers.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/utils/clipboard.ts",
           "frontend/src/pages/AdminLoginPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/utils/clipboard.ts",
           "frontend/src/pages/AdminLoginPage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-21",
+        "summary": "Adjust admin route behavior so an authenticated non-admin user attempting to open admin pages (e.g., `/admin`, `/admin/players`, `/admin/sponsors`, `/admin/teams`) is directed to the dedicated troubleshooting/admin-login experience (instead of being stuck on a dead-end denial screen), without creating redirect loops.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/admin/AdminRouteGuard.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/admin/AdminRouteGuard.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/admin/AdminRouteGuard.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
     "frontend/src/hooks/useQueries.ts",
     "frontend/src/pages/AdminLoginPage.tsx",
+    "frontend/src/utils/clipboard.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

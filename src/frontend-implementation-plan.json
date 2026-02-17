@@ -1,47 +1,65 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix Admin Login Principal ID retrieval lifecycle on mobile",
+  "title": "Fix admin access flow and first-admin bootstrap detection (frontend-only)",
   "requirements": [
     {
-      "id": "REQ-17",
-      "summary": "Fix `/admin/login` to retrieve and display the authenticated Principal ID via backend `getCallerIdAsText()` reliably on mobile, without using `window.ic`, and keep a usable Retry flow on failure.",
+      "id": "REQ-19",
+      "summary": "Drive “Become the First Admin” visibility from backend bootstrap status (not inferred from guest role).",
       "acceptanceCriteria": [
-        "On `/admin/login`, after signing in with Internet Identity on a mobile browser, the Principal ID field populates with a non-empty principal string (e.g., `aaaaa-aa...`) without showing “Failed to retrieve Principal ID”.",
-        "The Admin Login page does not depend on `window.ic` for Principal ID retrieval.",
-        "If Principal ID retrieval fails, the UI continues to show an actionable Retry button and the page remains usable (no crash/blank screen)."
+        "When at least one admin already exists, `/admin/login` does not show the “Become the First Admin” call-to-action to non-admin users.",
+        "When there are zero admins configured, an authenticated user visiting `/admin/login` sees the “Become the First Admin” call-to-action.",
+        "The backend exposes a query method that reliably indicates whether any admins exist (or returns an admin count), and the frontend uses it to drive the bootstrap UI state."
       ],
       "file_operations": [
         {
           "path": "frontend/src/hooks/useQueries.ts",
           "operation": "modify",
-          "description": "Update `useGetCallerIdAsText()` to be authentication-aware: key the query by the current identity (e.g., principal string) and avoid running the query in unauthenticated/anonymous state so it always uses the authenticated actor for `getCallerIdAsText()` (backend) and does not rely on any `window.ic` access. Verify the component's usage instructions before implementing."
+          "description": "Add a React Query hook that calls the backend capability `isSystemBootstrapNeeded()` and exposes its boolean result to the UI; ensure it is safe to use with actor readiness and authentication state. Verify the component's usage instructions before implementing."
         },
         {
           "path": "frontend/src/pages/AdminLoginPage.tsx",
           "operation": "modify",
-          "description": "Adjust the Principal ID display logic to rely exclusively on `useGetCallerIdAsText()` (backend) and ensure the error state renders a persistent Retry button without breaking page usability on mobile; ensure the UI only attempts to show/copy Principal once a non-empty principal string is available. Verify the component's usage instructions before implementing."
+          "description": "Replace the current `noAdminsExist` detection (based on `UserRole.guest`) with the new bootstrap-needed query result, and show “Become the First Admin” only when authenticated and the backend confirms bootstrap is needed. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-18",
-      "summary": "Tie Principal ID query lifecycle to authentication state so it automatically refreshes on login/logout/identity change and prevents stale error states, while preserving manual Retry.",
+      "id": "REQ-20",
+      "summary": "Improve the authenticated non-admin troubleshooting screen to always show backend-fetched Principal ID with robust copy and retry (mobile-friendly).",
       "acceptanceCriteria": [
-        "After clicking “Sign in with Internet Identity”, the Principal ID query is re-attempted automatically once the authenticated identity/actor is ready (without requiring manual Retry).",
-        "If a previous unauthenticated/failed attempt occurred, a subsequent successful sign-in results in a fresh Principal ID fetch and display.",
-        "Manual “Retry” still forces a refetch and can recover from transient failures."
+        "When an authenticated non-admin user is denied admin access, the screen shows “Your Principal ID” and displays the value returned by `getCallerIdAsText()`.",
+        "If Principal ID retrieval fails, the UI shows an error state and a retry button that re-runs the Principal ID query.",
+        "A copy button copies the Principal ID to the clipboard when available; if clipboard access fails, the user sees an error toast/message.",
+        "No code path attempts to read Principal ID from `window.ic` for this screen."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Ensure `useGetCallerIdAsText()` query cache is not reused across identity changes by including the identity in the React Query key and by enabling/disabling based on authenticated readiness; this should trigger an automatic refetch after login/logout/identity swap and prevent stale errors from persisting. Verify the component's usage instructions before implementing."
+          "path": "frontend/src/utils/clipboard.ts",
+          "operation": "create",
+          "description": "Create a small clipboard helper that attempts `navigator.clipboard.writeText` first and falls back to a mobile-compatible method (e.g., temporary textarea + selection) with a clear success/failure signal for toast messaging. Verify the component's usage instructions before implementing."
         },
         {
           "path": "frontend/src/pages/AdminLoginPage.tsx",
           "operation": "modify",
-          "description": "On logout from the admin login page, clear cached queries (e.g., via React Query client) to avoid stale Principal ID error states; optionally trigger invalidation/refetch of Principal/admin checks immediately after login succeeds to ensure automatic refresh without manual Retry. Verify the component's usage instructions before implementing."
+          "description": "In the authenticated non-admin Access Denied/troubleshooting view, always render a “Your Principal ID” section driven solely by `getCallerIdAsText()` (no `window.ic`), add an explicit retry button on failure that re-runs the query, and switch copy behavior to the shared clipboard helper with failure toasts/messages. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-21",
+      "summary": "Route authenticated non-admin users from admin pages to the troubleshooting/admin-login experience without redirect loops.",
+      "acceptanceCriteria": [
+        "Unauthenticated users who open any admin route are redirected to `/admin/login`.",
+        "Authenticated admins can access admin routes normally.",
+        "Authenticated non-admin users who open any admin route are routed to an admin-access troubleshooting experience (e.g., `/admin/login` or an equivalent screen) and are not trapped in redirect loops.",
+        "The routed troubleshooting experience continues to display Principal ID and sign-out options as shown in the uploaded screenshot context (Access Denied + Principal ID + Sign Out/Go to Home)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/admin/AdminRouteGuard.tsx",
+          "operation": "modify",
+          "description": "Change the authenticated non-admin behavior from rendering the dead-end `AccessDeniedScreen` to navigating to `/admin/login` (optionally preserving the attempted path via router state/search) while preventing redirect loops; keep unauthenticated redirects to `/admin/login` and allow authenticated admins through. Verify the component's usage instructions before implementing."
         }
       ]
     }

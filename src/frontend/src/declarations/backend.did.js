@@ -171,6 +171,8 @@ export const idlService = IDL.Service({
       [],
     ),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'assignRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'becomeFirstAdmin' : IDL.Func([], [], []),
   'checkout' : IDL.Func([], [CreatePaymentResponse], []),
   'deleteContentPage' : IDL.Func([IDL.Text], [], []),
   'deleteFile' : IDL.Func([IDL.Text], [], []),
@@ -231,6 +233,7 @@ export const idlService = IDL.Service({
       ['query'],
     ),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'isSystemBootstrapNeeded' : IDL.Func([], [IDL.Bool], ['query']),
   'listCategories' : IDL.Func([], [IDL.Vec(PlayerCategory)], ['query']),
   'listExperienceLevels' : IDL.Func(
       [],
@@ -457,6 +460,8 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'assignRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'becomeFirstAdmin' : IDL.Func([], [], []),
     'checkout' : IDL.Func([], [CreatePaymentResponse], []),
     'deleteContentPage' : IDL.Func([IDL.Text], [], []),
     'deleteFile' : IDL.Func([IDL.Text], [], []),
@@ -521,6 +526,7 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'isSystemBootstrapNeeded' : IDL.Func([], [IDL.Bool], ['query']),
     'listCategories' : IDL.Func([], [IDL.Vec(PlayerCategory)], ['query']),
     'listExperienceLevels' : IDL.Func(
         [],

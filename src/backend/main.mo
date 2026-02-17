@@ -12,9 +12,9 @@ import Map "mo:core/Map";
 import Storage "blob-storage/Storage";
 
 import MixinAuthorization "authorization/MixinAuthorization";
+import StripeMixin "stripe/StripeMixin";
 import MixinStorage "blob-storage/Mixin";
 import AccessControl "authorization/access-control";
-import StripeMixin "stripe/StripeMixin";
 
 // Apply migration on upgrade
 
@@ -199,6 +199,40 @@ actor {
 
   var sponsorInquiryCounter : Nat = 0;
   var fileCounter : Nat = 0;
+  var adminCount : Nat = 0;
+
+  public query ({ caller }) func isSystemBootstrapNeeded() : async Bool {
+    // Bootstrap is needed if no admin principal is registered yet.
+    // Public access - needed for UI to determine if "Become First Admin" should be shown
+    adminCount == 0;
+  };
+
+  // Track admin assignments to maintain accurate count
+  public shared ({ caller }) func becomeFirstAdmin() : async () {
+    if (adminCount > 0) {
+      Runtime.trap("System already has an admin");
+    };
+    AccessControl.initialize(accessControlState, caller, "", "");
+    adminCount += 1;
+  };
+
+  // Override assignRole to track admin count
+  public shared ({ caller }) func assignRole(user : Principal, role : AccessControl.UserRole) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admins can assign roles");
+    };
+
+    let oldRole = AccessControl.getUserRole(accessControlState, user);
+    AccessControl.assignRole(accessControlState, caller, user, role);
+
+    // Update admin count
+    switch (oldRole, role) {
+      case (#admin, #admin) { /* no change */ };
+      case (#admin, _) { adminCount -= 1 };
+      case (_, #admin) { adminCount += 1 };
+      case (_, _) { /* no change */ };
+    };
+  };
 
   // Stripe price setup for player registration - ADMIN ONLY
   public shared ({ caller }) func setupStripePrices() : async () {

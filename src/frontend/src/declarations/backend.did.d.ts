@@ -148,6 +148,8 @@ export interface _SERVICE {
     undefined
   >,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'assignRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'becomeFirstAdmin' : ActorMethod<[], undefined>,
   'checkout' : ActorMethod<[], CreatePaymentResponse>,
   'deleteContentPage' : ActorMethod<[string], undefined>,
   'deleteFile' : ActorMethod<[string], undefined>,
@@ -181,6 +183,7 @@ export interface _SERVICE {
   'getTeams' : ActorMethod<[], Array<TeamInfo>>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
+  'isSystemBootstrapNeeded' : ActorMethod<[], boolean>,
   'listCategories' : ActorMethod<[], Array<PlayerCategory>>,
   'listExperienceLevels' : ActorMethod<[], Array<CricketExperience>>,
   'listJerseySizes' : ActorMethod<[], Array<JerseySize>>,

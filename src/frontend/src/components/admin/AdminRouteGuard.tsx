@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from '@tanstack/react-router';
 import { useInternetIdentity } from '../../hooks/useInternetIdentity';
 import { useIsCallerAdmin } from '../../hooks/useQueries';
 import { Skeleton } from '@/components/ui/skeleton';
-import AccessDeniedScreen from './AccessDeniedScreen';
 
 interface AdminRouteGuardProps {
   children: ReactNode;
@@ -24,6 +23,14 @@ export default function AdminRouteGuard({ children }: AdminRouteGuardProps) {
       navigate({ to: '/admin/login' });
     }
   }, [isCheckingAuth, isAuthenticated, navigate]);
+
+  // Redirect authenticated non-admins to admin login page (troubleshooting experience)
+  // This prevents redirect loops because /admin/login handles non-admin display
+  useEffect(() => {
+    if (!isCheckingAuth && isAuthenticated && isAdmin === false && location.pathname !== '/admin/login') {
+      navigate({ to: '/admin/login' });
+    }
+  }, [isCheckingAuth, isAuthenticated, isAdmin, location.pathname, navigate]);
 
   // Show loading state while checking authentication and admin status
   if (isCheckingAuth) {
@@ -50,9 +57,16 @@ export default function AdminRouteGuard({ children }: AdminRouteGuardProps) {
     );
   }
 
-  // Show access denied for authenticated non-admins (stable, no redirect)
+  // Show transitional loading if authenticated non-admin (before redirect to /admin/login completes)
   if (isAuthenticated && isAdmin === false) {
-    return <AccessDeniedScreen />;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 py-12 flex items-center justify-center">
+        <div className="text-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto mb-4" />
+          <p className="text-muted-foreground">Redirecting...</p>
+        </div>
+      </div>
+    );
   }
 
   // Render admin content for authenticated admins

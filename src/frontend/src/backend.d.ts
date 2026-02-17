@@ -136,6 +136,8 @@ export enum UserRole {
 export interface backendInterface {
     addTeamInfo(name: string, owner: string | null, logo: string | null, purse: bigint, teamType: Team): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    assignRole(user: Principal, role: UserRole): Promise<void>;
+    becomeFirstAdmin(): Promise<void>;
     checkout(): Promise<CreatePaymentResponse>;
     deleteContentPage(pageId: string): Promise<void>;
     deleteFile(fileId: string): Promise<void>;
@@ -160,6 +162,7 @@ export interface backendInterface {
     getTeams(): Promise<Array<TeamInfo>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
+    isSystemBootstrapNeeded(): Promise<boolean>;
     listCategories(): Promise<Array<PlayerCategory>>;
     listExperienceLevels(): Promise<Array<CricketExperience>>;
     listJerseySizes(): Promise<Array<JerseySize>>;
