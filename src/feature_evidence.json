@@ -1,0 +1,47 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-diagnose-and-fix-the-admin-login-screen-so-that-after-a-successful-internet-identity-sign-in-the-authenticated-user-s-principal-id-is-reliably-retrieved-via-the-backend-method-getcalleridastext-not-via-window-ic-and-displayed-on-admin-login-including-on-mobile-browsers",
+      "featureTitle": "Diagnose and fix the Admin Login screen so that, after a successful Internet Identity sign-in, the authenticated user’s Principal ID is reliably retrieved via the backend method `getCallerIdAsText()` (not via `window.ic`) and displayed on `/admin/login`, including on mobile browsers.",
+      "files": [
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/AdminLoginPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-17"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-ensure-the-principal-id-query-lifecycle-is-tied-to-the-current-authentication-state-so-it-automatically-refreshes-when-the-internet-identity-session-becomes-available-e-g-after-login-logout-or-identity-change-preventing-stale-error-states-from-persisting-across-sign-in-attempts",
+      "featureTitle": "Ensure the Principal ID query lifecycle is tied to the current authentication state so it automatically refreshes when the Internet Identity session becomes available (e.g., after login, logout, or identity change), preventing stale error states from persisting across sign-in attempts.",
+      "files": [
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/AdminLoginPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-18"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

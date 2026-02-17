@@ -1,0 +1,190 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 13,
+  "summary": "Project for the Bihar Cricket Mahotsav website, including admin panel access setup (Principal ID + permissions), adding admin panel login capability, and making the front page simple and professional.",
+  "architectural_notes": [
+    "Admin Login must retrieve/display the authenticated user's Principal ID via a backend call (e.g., getCallerPrincipal) rather than relying on `window.ic`, which is unreliable across browsers (especially mobile)."
+  ],
+  "known_issues": [
+    "On the live site, retrieving Principal ID via `window.ic...` fails with 'ic is not defined' for the user; needs a reliable Principal ID retrieval method for admin setup.",
+    "User reports the `/admin/login` page is not working (admin login page/route may be broken or failing to load/sign in).",
+    "`frontend/src/pages/admin/AdminLogin.tsx` appears to still use the old `window.ic` Principal ID retrieval path; as a result, authenticated users see “Failed to retrieve Principal ID” instead of the backend-provided Principal ID."
+  ],
+  "isFixRequest": true,
+  "existing_features": [
+    {
+      "id": "feature-redesign-the-home-page-layout-to-look-simple-and-professional-by-reducing-visual-noise-heavy-gradients-layered-background-images-and-multiple-animated-decorative-elements-while-keeping-the-core-content-and-navigation-actions-intact-player-registration-cta-teams-key-highlights-registration-count-and-countdown-update-the-implementation-in-frontend-src-pages-homepage-tsx",
+      "title": "Redesign the Home page layout to look simple and professional by reducing visual noise (heavy gradients, layered background images, and multiple animated decorative elements) while keeping the core content and navigation actions intact (player registration CTA, teams, key highlights, registration count, and countdown). Update the implementation in `frontend/src/pages/HomePage.tsx`.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-normalize-typography-and-spacing-on-the-home-page-to-a-more-consistent-professional-hierarchy-e-g-reduce-extremely-large-headline-sizes-limit-the-number-of-font-decoration-styles-in-the-hero-and-use-consistent-paddings-margins-across-sections-ensure-good-readability-on-mobile-and-desktop",
+      "title": "Normalize typography and spacing on the Home page to a more consistent, professional hierarchy (e.g., reduce extremely large headline sizes, limit the number of font/decoration styles in the hero, and use consistent paddings/margins across sections). Ensure good readability on mobile and desktop.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-simplify-or-remove-non-essential-motion-effects-used-on-the-home-page-e-g-floating-elements-drifting-elements-slow-pans-zooms-bounce-indicators-to-achieve-a-professional-feel-while-keeping-any-motion-that-directly-improves-usability-e-g-subtle-hover-states",
+      "title": "Simplify or remove non-essential motion effects used on the Home page (e.g., floating elements, drifting elements, slow pans/zooms, bounce indicators) to achieve a professional feel, while keeping any motion that directly improves usability (e.g., subtle hover states).",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-consistent-global-font-system-primary-fallback-fonts-that-renders-well-for-both-latin-and-devanagari-text-and-apply-it-site-wide",
+      "title": "Implement a consistent global font system (primary + fallback fonts) that renders well for both Latin and Devanagari text, and apply it site-wide.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-standardized-typography-scale-headings-body-small-text-and-apply-it-consistently-across-key-pages-prioritizing-the-home-page-hero-and-section-headers-while-keeping-readability-strong-on-mobile-and-desktop",
+      "title": "Create a standardized typography scale (headings, body, small text) and apply it consistently across key pages, prioritizing the Home page hero and section headers while keeping readability strong on mobile and desktop.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-tailwind-theme-configuration-to-expose-the-chosen-font-families-via-tailwind-e-g-font-sans-font-display-and-ensure-typography-utilities-can-be-used-consistently-in-components-pages",
+      "title": "Update Tailwind theme configuration to expose the chosen font families via Tailwind (e.g., font-sans/font-display) and ensure typography utilities can be used consistently in components/pages.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-dedicated-admin-login-page-and-route-at-admin-login-that-allows-an-administrator-to-sign-in-using-internet-identity-and-then-proceed-to-the-admin-panel",
+      "title": "Add a dedicated Admin Login page and route at `/admin/login` that allows an administrator to sign in using Internet Identity and then proceed to the admin panel.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-consistent-access-control-for-all-admin-routes-admin-admin-players-admin-sponsors-admin-teams-so-that-unauthenticated-users-are-redirected-to-admin-login-and-authenticated-non-admin-users-see-a-consistent-access-denied-ui",
+      "title": "Implement consistent access control for all admin routes (`/admin`, `/admin/players`, `/admin/sponsors`, `/admin/teams`) so that unauthenticated users are redirected to `/admin/login`, and authenticated non-admin users see a consistent Access Denied UI.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-admin-login-page-to-clearly-support-admin-setup-troubleshooting-by-always-showing-the-authenticated-user-s-principal-id-from-the-backend-and-offering-a-first-admin-bootstrap-action-when-no-admins-exist-yet",
+      "title": "Update the Admin Login page to clearly support admin setup/troubleshooting by always showing the authenticated user’s Principal ID (from the backend) and offering a first-admin bootstrap action when no admins exist yet.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-react-query-hooks-mutations-for-the-new-admin-setup-backend-method-s-and-ensure-admin-related-cached-queries-are-refreshed-after-admin-setup",
+      "title": "Add React Query hooks/mutations for the new admin-setup backend method(s) and ensure admin-related cached queries are refreshed after admin setup.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-diagnose-and-fix-the-admin-login-page-so-it-reliably-loads-and-the-sign-in-with-internet-identity-button-successfully-initiates-internet-identity-authentication-in-the-live-build",
+      "title": "Diagnose and fix the `/admin/login` page so it reliably loads and the “Sign in with Internet Identity” button successfully initiates Internet Identity authentication in the live build.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-internet-identity-provider-configuration-used-by-the-frontend-is-valid-at-runtime-so-login-does-not-fail-due-to-a-missing-undefined-identityprovider-e-g-process-env-ii-url-provide-a-safe-fallback-to-the-production-internet-identity-url-when-configuration-is-missing",
+      "title": "Ensure the Internet Identity provider configuration used by the frontend is valid at runtime so login does not fail due to a missing/undefined identityProvider (e.g., `process.env.II_URL`). Provide a safe fallback to the production Internet Identity URL when configuration is missing.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-improve-admin-login-troubleshooting-ux-so-users-can-understand-their-state-not-signed-in-vs-signed-in-but-not-admin-and-can-always-retrieve-and-copy-their-principal-id-after-signing-in",
+      "title": "Improve `/admin/login` troubleshooting UX so users can understand their state (not signed in vs signed in but not admin) and can always retrieve and copy their Principal ID after signing in.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-verify-and-fix-admin-routing-redirect-behavior-so-admin-pages-behave-consistently-unauthenticated-users-are-redirected-to-admin-login-authenticated-admins-are-routed-to-admin-and-authenticated-non-admins-see-a-consistent-access-denied-ui-without-redirect-loops",
+      "title": "Verify and fix admin routing/redirect behavior so admin pages behave consistently: unauthenticated users are redirected to `/admin/login`, authenticated admins are routed to `/admin`, and authenticated non-admins see a consistent Access Denied UI without redirect loops.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-diagnose-and-fix-the-admin-login-screen-so-that-after-a-successful-internet-identity-sign-in-the-authenticated-user-s-principal-id-is-reliably-retrieved-via-the-backend-method-getcalleridastext-not-via-window-ic-and-displayed-on-admin-login-including-on-mobile-browsers",
+      "title": "Diagnose and fix the Admin Login screen so that, after a successful Internet Identity sign-in, the authenticated user’s Principal ID is reliably retrieved via the backend method `getCallerIdAsText()` (not via `window.ic`) and displayed on `/admin/login`, including on mobile browsers.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-principal-id-query-lifecycle-is-tied-to-the-current-authentication-state-so-it-automatically-refreshes-when-the-internet-identity-session-becomes-available-e-g-after-login-logout-or-identity-change-preventing-stale-error-states-from-persisting-across-sign-in-attempts",
+      "title": "Ensure the Principal ID query lifecycle is tied to the current authentication state so it automatically refreshes when the Internet Identity session becomes available (e.g., after login, logout, or identity change), preventing stale error states from persisting across sign-in attempts.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Redesign the front page to look simple and professional.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Update/improve typography and fonts on the front page (typography hierarchy, font choices, readability).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Add admin panel login/access for the website (admin authentication to log in).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Add a backend query method that returns the authenticated caller's Principal ID as text so the frontend can display it on the admin login screen for reliable admin setup/troubleshooting (without relying on `window.ic`).",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Provide a clear admin setup flow to add the user's Principal ID to the backend admin list (so they can log in without Access Denied).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Add a backend admin-setup capability so a Principal can be added to the admin list to resolve “Access Denied” for legitimate administrators.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Bihar Cricket Mahotsav",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

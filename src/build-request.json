@@ -1,0 +1,69 @@
+{
+  "kind": "build_request",
+  "title": "Fix Admin Login Principal ID retrieval on mobile",
+  "projectName": "Bihar Cricket Mahotsav",
+  "priority": "high",
+  "requirements": [
+    {
+      "id": "REQ-17",
+      "text": "Diagnose and fix the Admin Login screen so that, after a successful Internet Identity sign-in, the authenticated user’s Principal ID is reliably retrieved via the backend method `getCallerIdAsText()` (not via `window.ic`) and displayed on `/admin/login`, including on mobile browsers.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "yes fix it",
+          "facing this problem"
+        ]
+      },
+      "acceptanceCriteria": [
+        "On `/admin/login`, after signing in with Internet Identity on a mobile browser, the Principal ID field populates with a non-empty principal string (e.g., `aaaaa-aa...`) without showing “Failed to retrieve Principal ID”.",
+        "The Admin Login page does not depend on `window.ic` for Principal ID retrieval.",
+        "If Principal ID retrieval fails, the UI continues to show an actionable Retry button and the page remains usable (no crash/blank screen)."
+      ]
+    },
+    {
+      "id": "REQ-18",
+      "text": "Ensure the Principal ID query lifecycle is tied to the current authentication state so it automatically refreshes when the Internet Identity session becomes available (e.g., after login, logout, or identity change), preventing stale error states from persisting across sign-in attempts.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Failed to retrieve Principal ID. Please try again."
+        ]
+      },
+      "acceptanceCriteria": [
+        "After clicking “Sign in with Internet Identity”, the Principal ID query is re-attempted automatically once the authenticated identity/actor is ready (without requiring manual Retry).",
+        "If a previous unauthenticated/failed attempt occurred, a subsequent successful sign-in results in a fresh Principal ID fetch and display.",
+        "Manual “Retry” still forces a refetch and can recover from transient failures."
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not edit files under `frontend/src/hooks/useInternetIdentity.ts` / `frontend/src/hooks/useInternetIdentity.tsx` or other paths listed in `frontend.immutablePaths`.",
+    "Backend remains single-actor; do not introduce additional canisters/services."
+  ],
+  "nonGoals": [
+    "Redesigning the Home page UI/typography/motion (already covered by existing features).",
+    "Adding new authentication providers beyond Internet Identity."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [
+      "Use English for any user-facing text."
+    ],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
+  }
+}

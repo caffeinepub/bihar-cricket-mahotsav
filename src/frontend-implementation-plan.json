@@ -1,0 +1,49 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Fix Admin Login Principal ID retrieval lifecycle on mobile",
+  "requirements": [
+    {
+      "id": "REQ-17",
+      "summary": "Fix `/admin/login` to retrieve and display the authenticated Principal ID via backend `getCallerIdAsText()` reliably on mobile, without using `window.ic`, and keep a usable Retry flow on failure.",
+      "acceptanceCriteria": [
+        "On `/admin/login`, after signing in with Internet Identity on a mobile browser, the Principal ID field populates with a non-empty principal string (e.g., `aaaaa-aa...`) without showing “Failed to retrieve Principal ID”.",
+        "The Admin Login page does not depend on `window.ic` for Principal ID retrieval.",
+        "If Principal ID retrieval fails, the UI continues to show an actionable Retry button and the page remains usable (no crash/blank screen)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Update `useGetCallerIdAsText()` to be authentication-aware: key the query by the current identity (e.g., principal string) and avoid running the query in unauthenticated/anonymous state so it always uses the authenticated actor for `getCallerIdAsText()` (backend) and does not rely on any `window.ic` access. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/AdminLoginPage.tsx",
+          "operation": "modify",
+          "description": "Adjust the Principal ID display logic to rely exclusively on `useGetCallerIdAsText()` (backend) and ensure the error state renders a persistent Retry button without breaking page usability on mobile; ensure the UI only attempts to show/copy Principal once a non-empty principal string is available. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-18",
+      "summary": "Tie Principal ID query lifecycle to authentication state so it automatically refreshes on login/logout/identity change and prevents stale error states, while preserving manual Retry.",
+      "acceptanceCriteria": [
+        "After clicking “Sign in with Internet Identity”, the Principal ID query is re-attempted automatically once the authenticated identity/actor is ready (without requiring manual Retry).",
+        "If a previous unauthenticated/failed attempt occurred, a subsequent successful sign-in results in a fresh Principal ID fetch and display.",
+        "Manual “Retry” still forces a refetch and can recover from transient failures."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Ensure `useGetCallerIdAsText()` query cache is not reused across identity changes by including the identity in the React Query key and by enabling/disabling based on authenticated readiness; this should trigger an automatic refetch after login/logout/identity swap and prevent stale errors from persisting. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/AdminLoginPage.tsx",
+          "operation": "modify",
+          "description": "On logout from the admin login page, clear cached queries (e.g., via React Query client) to avoid stale Principal ID error states; optionally trigger invalidation/refetch of Principal/admin checks immediately after login succeeds to ensure automatic refresh without manual Retry. Verify the component's usage instructions before implementing."
+        }
+      ]
+    }
+  ]
+}
